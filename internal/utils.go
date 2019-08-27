@@ -2,11 +2,12 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
+
+	logger "github.com/sirupsen/logrus"
 )
 
 var (
@@ -29,19 +30,22 @@ func getCurrentRate(URI string) float64 {
 
 	response, err := http.Get(URI)
 	if err != nil {
-		fmt.Println("failed")
+		logger.Error(err)
+		return rate, err
 	}
 
 	defer response.Body.Close()
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println("failed")
+		logger.Error(err)
+		return rate, err
 	}
 
 	err = json.Unmarshal(data, &responseJSON)
 	if err != nil {
-		fmt.Println("failed")
+		logger.Error(err)
+		return rate, err
 	}
 
 	now := time.Now()

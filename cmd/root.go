@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/glitchcrab/octopus-agile-exporter/internal"
+	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -40,8 +41,8 @@ Product and tariff codes can be provided as flags or environment variables.
 If provided, environment variables take precedence.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("called bare command")
-		internal.CollectorLoop(productCode, tariffCode)
+		logger.Info("Exporter initialised.")
+		internal.Loop(productCode, tariffCode)
 	},
 }
 
@@ -56,6 +57,7 @@ func Execute() {
 
 // Initialise config and parse flags.
 func init() {
+	logger.Info("Starting exporter.")
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&productCode, "product-code", "", "Product code (env OCTOPUS_PRODUCT_CODE).")
@@ -69,7 +71,7 @@ func initConfig() {
 		productCode = os.Getenv("OCTOPUS_PRODUCT_CODE")
 	} else {
 		if productCode == "" {
-			fmt.Println("var should not be empty")
+			logger.Fatal("Product code must be provided.")
 		}
 	}
 	// get tariff code if it isn't passed as a flag
@@ -77,7 +79,7 @@ func initConfig() {
 		tariffCode = os.Getenv("OCTOPUS_TARIFF_CODE")
 	} else {
 		if tariffCode == "" {
-			fmt.Println("var should not be empty")
+			logger.Fatal("Tariff code must be provided.")
 		}
 	}
 }
