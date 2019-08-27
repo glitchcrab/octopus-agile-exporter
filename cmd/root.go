@@ -61,7 +61,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&productCode, "product-code", "", "Product code (env OCTOPUS_PRODUCT_CODE).")
-	rootCmd.PersistentFlags().StringVar(&tariffCode, "tarrif-code", "", "Tariff code (env OCTOPUS_TARIFF_CODE).")
+	rootCmd.PersistentFlags().StringVar(&tariffCode, "tariff-code", "", "Tariff code (env OCTOPUS_TARIFF_CODE).")
 }
 
 // initConfig reads ENV variables if set. ENV variables take precedence over flags.
