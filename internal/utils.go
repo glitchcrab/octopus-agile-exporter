@@ -7,13 +7,30 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	logger "github.com/sirupsen/logrus"
 )
 
+const (
+	fuel = "electricity"
+)
+
 var (
-	baseURI = "api.octopus.energy"
-	scheme  = "https"
-	rate    float64
+	baseURI    = "api.octopus.energy"
+	scheme     = "https"
+	rate       float64
+	rateMetric = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			// set metric name and help string
+			Name: "octopus_agile_kwh_price",
+			Help: "Gauge vector in pence per kilowatt hour.",
+		},
+		// set labels for each metric
+		[]string{
+			"fuel",
+		},
+	)
 )
 
 func createURL(productCode, tariffCode string) string {
@@ -54,11 +71,20 @@ func getCurrentRate(URI string) float64 {
 			rate = period.ValueIncVat
 		}
 	}
-	fmt.Println(rate)
-	return rate
+
+	rateMetric.WithLabelValues(
+		fuel,
+	).Set(rate)
+
+	return rate, err
 }
 
-func CollectorLoop(productCode, tariffCode string) {
+// Infinite loop to run the application's functionality
+func Loop(productCode, tariffCode string) {
+	prometheus.MustRegister(rateMetric)
+
+	go ServeMetrics()
+
 	URI := createURL(productCode, tariffCode)
 	for {
 		go getCurrentRate(URI)
@@ -66,4 +92,10 @@ func CollectorLoop(productCode, tariffCode string) {
 		// sleep until the next iteration
 		time.Sleep(60 * time.Second)
 	}
+}
+
+// Serves all registered metrics for scraping
+func ServeMetrics() {
+	http.Handle("/metrics", promhttp.Handler())
+	http.ListenAndServe(":8080", nil)
 }
