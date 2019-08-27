@@ -33,6 +33,7 @@ var (
 	)
 )
 
+// Concatenates the user's supplied args to create the API URL.
 func createURL(productCode, tariffCode string) string {
 	fullURL := url.URL{
 		Scheme: scheme,
@@ -42,8 +43,11 @@ func createURL(productCode, tariffCode string) string {
 	return fullURL.String()
 }
 
-func getCurrentRate(URI string) float64 {
+// Calls Octopus's API and extracts the pricing for the current
+// half-hourly period.
+func getCurrentRate(URI string) (float64, error) {
 	var responseJSON APIResponse
+	var rate float64
 
 	response, err := http.Get(URI)
 	if err != nil {
