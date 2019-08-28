@@ -29,6 +29,8 @@ var (
 		// set labels for each metric
 		[]string{
 			"fuel",
+			"product_code",
+			"tariff_code",
 		},
 	)
 )
@@ -45,7 +47,7 @@ func createURL(productCode, tariffCode string) string {
 
 // Calls Octopus's API and extracts the pricing for the current
 // half-hourly period.
-func getCurrentRate(URI string) (float64, error) {
+func getCurrentRate(URI, productCode, tariffCode string) (float64, error) {
 	var responseJSON APIResponse
 	var rate float64
 
@@ -78,6 +80,8 @@ func getCurrentRate(URI string) (float64, error) {
 
 	rateMetric.WithLabelValues(
 		fuel,
+		productCode,
+		tariffCode,
 	).Set(rate)
 
 	return rate, err
@@ -91,7 +95,7 @@ func Loop(productCode, tariffCode string) {
 
 	URI := createURL(productCode, tariffCode)
 	for {
-		go getCurrentRate(URI)
+		go getCurrentRate(URI, productCode, tariffCode)
 
 		// sleep until the next iteration
 		time.Sleep(60 * time.Second)
