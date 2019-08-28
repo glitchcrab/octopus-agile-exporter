@@ -37,5 +37,13 @@ An image is already available on the [Docker hub](https://hub.docker.com/r/glitc
 docker run -it --rm -e OCTOPUS_PRODUCT_CODE="" -e OCTOPUS_TARIFF_CODE="" glitchcrab/octopus-agile-exporter:latest
 ```
 
+## Shameless plug
+
+If you're planning on signing up to Octopus then please consider using my referral code - we both get £50 credit :)
+
+```
+https://share.octopus.energy/sage-queen-330
+```
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
